@@ -1,0 +1,450 @@
+// imports, mixins variables
+@import 'node_modules/bootstrap/scss/bootstrap.scss';
+@import './fonts.scss';
+@import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,700,900&subset=latin-ext');
+
+$screen-l: 991px;
+$screen-m: 768px;
+$screen-s: 480px;
+$color-lightest: #DEE7E4;
+$color-light: #99BDB1;
+$color-text: #68877D;
+$color-green: #2A7E62;
+$color-green-dark: #1F322C;
+$color-green-light: #113032;
+$color-orange: #FF5B25;
+
+@function angle ($deg) {
+    @if type-of($deg) == 'number' {
+        @return mod(abs($deg - 450), 360deg);
+    } @else {
+        $position: to + " ";
+        @each $pos in $deg {
+            $position: $position + opposite-position($pos) + " ";
+        }
+
+        @return $position;
+    }
+}
+
+@function helper-gradient-angle ($direction) {
+
+    $old-direction: $direction;
+    $veryold-direction: $direction;
+
+    // New Syntax has to be evaluated to old one
+    @if $direction == 'to bottom' {
+        $old-direction: 'top';
+    } @else if $direction == 'to right' {
+        $old-direction: 'left';
+    } @else if $direction == 'to top' {
+        $old-direction: 'bottom';
+    } @else if $direction == 'to left' {
+        $old-direction: 'right';
+    } @else {
+        $old-direction: angle($direction);
+    }
+
+    // And also for very old syntax
+    @if $direction == 'to bottom' {
+        $veryold-direction: 'left top, left bottom';
+    } @else if $direction == 'to right' {
+        $veryold-direction: 'top left, bottom right';
+    } @else if $direction == 'to top' {
+        $veryold-direction: 'left bottom, left top';
+    } @else if $direction == 'to left' {
+        $veryold-direction: 'top right, bottom left';
+    } @else {
+        $veryold-direction: angle($direction);
+    }
+
+
+    @return $old-direction, $veryold-direction;
+}
+
+@mixin x-linear-gradient ($direction: 'to bottom', $fallback: #fff, $from: #fff, $to: #fff) {
+
+    $directions: helper-gradient-angle($direction);
+
+    // Provide a fallback-color
+    background-color: $fallback;
+
+    // Cross-browser linear-gradients
+    background-image: -webkit-gradient(linear, unquote(nth($directions, 2)), from($from), to($to)); // Android 2.1-3.0
+    background-image: -webkit-linear-gradient(unquote(nth($directions, 1)), $from, $to);
+    background-image:         linear-gradient(unquote($direction), $from, $to);
+}
+
+@mixin inset-border ($height: 5px, $color: $color-green) {
+    -webkit-box-shadow:inset 0px 0px 0px $height $color;
+    -moz-box-shadow:inset 0px 0px 0px $height $color;
+    box-shadow:inset 0px 0px 0px $height $color;
+}
+
+// base style
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+
+#root {
+    min-height: 100vh; padding-bottom: 60px;
+}
+
+h1, h2 {
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 42px;
+    @media only screen and (max-width: $screen-m) { font-size: 30px;  }
+}
+
+h4 {
+    font-size: 24px; font-weight: 300;
+}
+
+p {
+    font-weight: 300; font-size: 14px; color: $color-text;
+}
+
+.btn {
+    padding: 8px 40px;
+    border: 0; border-radius: 30px;
+    font-weight: 300; font-size: 16px;
+}
+
+.btn:focus {
+    outline: none; border: 0; box-shadow: none;
+}
+
+.btn.btn-primary:hover,
+.btn.btn-primary:not(:disabled):active {
+    background-color: lighten($color-green, 10%);
+}
+
+.btn.btn-primary {
+    background-color: $color-green;
+}
+
+.btn.btn-danger:hover,
+.btn.btn-danger:not(:disabled):active {
+    background-color: lighten($color-orange, 10%);
+}
+
+.btn.btn-danger {
+    background-color: $color-orange;
+}
+
+.btn.btn-white {
+    padding: 6px 38px; background: #fff; border: 2px solid $color-green; color: #000;
+    &:hover { background: $color-lightest; }
+}
+
+.btn.btn-small {
+    height: 30px; width: 120px;
+    padding: 0;
+    font-size: 12px; line-height: 30px;
+    &.btn-white { line-height: 26px; }
+    .ic {
+        margin-left: 10px;
+        color: $color-green; font-size: 8px; line-height: 6px;
+    }
+    > span { display: inline-block; vertical-align: middle; }
+}
+
+footer {
+    width: 100%; height: 40px;
+    line-height: 40px; color: $color-text; text-align: right;
+    font-weight: 300; font-size: 14px;
+    span { display: inline-block; vertical-align: middle; }
+    .ic { line-height: 12px; margin-left: 30px; }
+    @include x-linear-gradient('to left', #000, $color-green-dark, #000);
+}
+
+.loader {
+    width: 60px; height: 60px;
+    margin-left: auto; margin-right: auto;
+    border: 8px solid #fff; border-top: 8px solid $color-orange; border-radius: 50%;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+// custom style
+.portal {
+    display: table;
+    div.overlay {
+        display: flex !important; height: 100%;
+        position: fixed; z-index: 9999; top: 0px;
+        left: 0px; right: 0px; bottom: 0px;
+        align-items: center;
+        background-color: rgba($color-green-dark, .8);
+    }
+    div.modal {
+        width: 640px;
+        position: relative; left: initial; top: initial;
+        right: initial; bottom: initial;
+        margin: auto; padding: 40px 20px;
+        border: 0px; background: #fff; border-radius: 0px;
+        overflow: auto; outline: none;
+        text-align: center;
+    }
+}
+
+nav.navbar {
+    height: 90px;
+    line-height: 90px;
+    @include x-linear-gradient('to left', $color-green, $color-green, $color-green-light);
+    @media only screen and (max-width: $screen-l) { height: 120px; line-height: 60px; }
+    ul {
+        height: 90px;
+        @media only screen and (max-width: $screen-l) { width: 100%; height: 60px; text-align: center; }
+    }
+    li {
+        a {
+            display: block; margin-left: 50px; text-align: center;
+            @media only screen and (max-width: $screen-l) { font-size: 18px; margin-left: 36px; }
+            @media only screen and (max-width: $screen-s) { font-size: 14px; margin-left: 18px; }
+            &:hover { color: #fff; }
+            &.active { box-shadow: 0px -5px 0px #fff inset; color: #fff; }
+        }
+    }
+    a {
+        font-size: 21px; font-weight: 30px; color: $color-light;
+        &:hover { text-decoration: none; }
+    }
+    .logo {
+        height: 40px;
+        @media only screen and (max-width: $screen-l) { height: 30px; }
+    }
+    .navbar-header {
+        @media only screen and (max-width: $screen-l) { width: 100%; text-align: center; }
+    }
+}
+
+.event-list {
+    margin-top: 45px;
+    @media only screen and (max-width: $screen-l) { margin-top: 25px; }
+}
+
+.event-row {
+    .seperator {
+        padding-bottom: 35px;
+        > div { height: 5px; width: 100%; background-color: $color-green; }
+    }
+    a.more {
+        font-size: 12px; color: $color-green; font-weight: 300;
+        span { display: inline-block; vertical-align: middle; }
+        .ic { font-size: 6px; line-height: 4px; margin-left: 4px; }
+    }
+    .desc.expanded {
+        a { display: none; }
+        p {
+            height: 100%;
+            &:after { display: none; }
+        }
+    }
+    p {
+        height: 82px; overflow-y: hidden; position: relative;
+        margin-bottom: 5px;
+        &:after {
+            content: '';
+            width: 50%; height: 16px;
+            position: absolute; bottom: 0; right: 0;
+            @include x-linear-gradient('to right', transparent, transparent, #fff);
+        }
+    }
+    .tickets-left {
+        display: inline-block; vertical-align: middle;
+        padding-right: 20px;
+        font-size: 16px; color: $color-light; font-weight: 300;
+    }
+    .controls { padding-top: 20px; text-align: right; }
+    .event-image {
+        width: 225px; height: 225px;
+        margin-left: auto;
+        font-size: 16px; font-weight: 300;
+        @media only screen and (max-width: $screen-l) { width: 125px; height: 125px; }
+        @media only screen and (max-width: $screen-m) { display: none; }
+    }
+}
+
+.event-image { background-position: center; background-size: cover; }
+
+.event-details {
+    padding-bottom: 16px;
+    .detail {
+        display: inline-block; vertical-align: middle; margin-right: 30px;
+        @media only screen and (max-width: $screen-s) { display: block; margin-bottom: 6px; }
+        .ic {
+            margin-right: 10px;
+            color: $color-green; font-size: 18px; line-height: 16px;
+            @media only screen and (max-width: $screen-l) { font-size: 14px; }
+        }
+        > span {
+            display: inline-block; vertical-align: middle; font-weight: 300;
+            @media only screen and (max-width: $screen-l) { font-size: 14px; }
+        }
+    }
+}
+
+nav.navbar {
+    width: 100%; z-index: 999;
+    ul { display: block; }
+    li { display: inline-block; }
+}
+
+.evvent {
+    padding-top: 80px;
+    @media only screen and (max-width: $screen-s) { padding-top: 50px; }
+}
+
+.tix {
+    width: 100%; margin-top: 40px;
+    @media only screen and (max-width: $screen-s) { margin-top: 0; margin-bottom: 50px; }
+    td {
+        padding-top: 40px; padding-bottom: 80px; border-top: 5px solid $color-orange;
+        @media only screen and (max-width: $screen-s) { display: block; padding: 15px 0 0 0; }
+    }
+    tr {
+        &.plc td { border-top: 0; }
+        &.burned,
+        &.listed {
+            td:last-child {
+                vertical-align: top;
+                @media only screen and (max-width: $screen-l) { vertical-align: middle; }
+                @media only screen and (max-width: $screen-s) { border: 0; }
+            }
+        }
+        &.burned {
+            td { border-top: 5px solid $color-light; }
+            .status { background-color: $color-light; }
+        }
+        &.listed {
+            td { border-top: 5px solid $color-green; }
+            .status { background-color: $color-green; }
+        }
+    }
+    td:first-child {
+        width: 140px; position: relative; padding-left: 40px;
+        @media only screen and (max-width: $screen-l) { width: 0; padding: 0; margin-top: 30px; }
+    }
+    .status {
+        position: absolute; left: 0; top: -5px;
+        padding: 2px 5px;
+        background-color: $color-orange;
+        white-space: nowrap;
+        font-weight: 300; font-size: 12px; color: #fff;
+        @media only screen and (max-width: $screen-s) { top: 0; }
+    }
+    h4 {
+        @media only screen and (max-width: $screen-s) { padding-top: 15px; }
+    }
+    td:last-child {
+        width: 160px; padding-right: 40px; text-align: right;
+        @media only screen and (max-width: $screen-s) {
+            width: 100%;
+            padding-right: 0;
+            border: 0;
+            text-align: right;
+        }
+    }
+    .btn { margin-bottom: 5px; margin-top: 5px; }
+    .event-details { padding-bottom: 0; }
+    .detail {
+        @media only screen and (max-width: $screen-l) { display: block; }
+    }
+    .event-image {
+        height: 80px; width: 80px;
+        @media only screen and (max-width: $screen-l) { display: none; }
+    }
+}
+
+.control-input {
+    display: inline-block;
+    > div {
+        width: 160px; height: 40px;
+        border: 2px solid $color-green; border-radius: 30px;
+        line-height: 40px; font-size: 0;
+    }
+    label {
+        margin-right: 20px; margin-bottom: 0;
+        color: $color-text; line-height: 40px;
+    }
+    > div,
+    label { display: inline-block; vertical-align: middle; }
+    input,
+    button {
+        display: inline-block; height: 36px; vertical-align: top;
+        margin: 0; padding: 6px;
+        line-height: 24px; font-size: 16px;
+        &:focus { outline: none; border: 0; box-shadow: none; }
+    }
+    input {
+        width: 60px; border: 0; text-align: center;
+    }
+    button {
+        width: 48px;
+        background: none; border: 0; font-size: 16px;
+        color: $color-green;
+        .ic { display: inline-block; vertical-align: middle; line-height: 14px; }
+        &:hover { color: #000; }
+    }
+}
+
+.round-wrap-btn {
+    border: 2px solid $color-green; border-radius: 18px;
+    &.small {
+        height: 60px;
+        @media only screen and (max-width: $screen-s) { height: 90px; }
+        span { display: block; text-align: center; font-weight: 300; }
+        .empty {
+            height: 28px;
+            background-color: $color-lightest;
+            border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
+            line-height: 28px;
+            @media only screen and (max-width: $screen-s) { line-height: 43px; height: 43px; }
+        }
+        .tag {
+            font-size: 12px; line-height: 28px;
+            @media only screen and (max-width: $screen-s) { height: 43px; line-height: 43px; }
+        }
+        .btn {
+            margin-top: 0; margin-bottom: -2px;
+            @media only screen and (max-width: $screen-s) { width: 100%; height: 43px; line-height: 43px; }
+        }
+    }
+}
+
+.modal {
+    p { padding-top: 16px; }
+    .btn { margin-left: 15px; margin-right: 15px; }
+    .control-input {
+        margin-left: auto; margin-right: auto;
+        margin-top: 12px; margin-bottom: 40px;
+    }
+}
+
+.btn-download {
+    .ic {
+        display: inline-block; vertical-align: middle;
+        margin-left: 10px;
+        font-size: 12px; line-height: 10px; color: $color-green;
+    }
+}
+
+.unconf {
+    color: $color-text; font-weight: 300; font-size: 12px;
+}
+
+.token-status {
+    height: 48px;
+    background-color: $color-lightest;
+    text-align: right; line-height: 48px;
+    span, .btn { display: inline-block; vertical-align: middle; }
+    span { font-size: 14px; font-weight: 300; }
+    .btn { margin-left: 12px; }
+}
